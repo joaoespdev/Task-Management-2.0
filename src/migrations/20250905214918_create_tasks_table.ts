@@ -4,18 +4,17 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('tasks', (table) => {
     table.increments('id').primary();
     table.string('title').notNullable();
-    table.text('description');
+    table.text('description').notNullable();
     table
-      .integer('responsible_id')
+      .enum('status', ['pending', 'in_progress', 'completed'])
+      .defaultTo('pending');
+    table
+      .integer('assignee_id')
       .unsigned()
       .references('id')
       .inTable('users')
       .onDelete('SET NULL');
-    table
-      .enu('status', ['pendente', 'em_andamento', 'concluida'])
-      .notNullable()
-      .defaultTo('pendente');
-    table.timestamp('deadline').notNullable();
+    table.timestamp('due_date').notNullable();
     table.timestamps(true, true); // created_at, updated_at
   });
 }

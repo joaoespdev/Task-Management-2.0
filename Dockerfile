@@ -7,6 +7,9 @@ RUN npm install
 
 COPY . .
 
+# Copiar .env para dentro do container
+COPY .env .env
+
 RUN npm run build
 
 EXPOSE 3000

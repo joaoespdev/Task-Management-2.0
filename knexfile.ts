@@ -1,11 +1,11 @@
-import { Knex } from "knex";
-import * as dotenv from "dotenv";
+import { Knex } from 'knex';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
 const config: { [key: string]: Knex.Config } = {
   development: {
-    client: "pg",
+    client: 'pg',
     connection: {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
@@ -14,10 +14,10 @@ const config: { [key: string]: Knex.Config } = {
       database: process.env.DB_NAME,
     },
     migrations: {
-      directory: "./src/migrations",
+      directory: './src/migrations',
     },
     seeds: {
-      directory: "./src/seeds",
+      directory: './src/seeds',
     },
   },
 };
