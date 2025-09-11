@@ -6,13 +6,16 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilita CORS permite chamadas do Frontend
+  // Middleware de logging PRIMEIRO
+  app.use((req, res, next) => {
+    console.log('Request Headers:', req.headers);
+    console.log('Authorization:', req.headers.authorization);
+    next();
+  });
+
+  // Depois as outras configurações
   app.enableCors();
-
-  // Prefixo global para todas as rotas (ex: /api/users)
   app.setGlobalPrefix('api');
-
-  // Validação global dos DTOs
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
@@ -22,7 +25,7 @@ async function bootstrap() {
     .setTitle('Task Management API')
     .setDescription('API para gerenciamento de tarefas')
     .setVersion('1.0')
-    .addBearerAuth() // para JWT
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

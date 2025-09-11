@@ -8,11 +8,12 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Importe o guard personalizado
 
 @Controller('users')
 export class UsersController {
@@ -28,19 +29,19 @@ export class UsersController {
     return this.usersService.login(dto.email, dto.password);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard) // Use o guard personalizado
   @Get()
   async findAll() {
     return this.usersService.listUsers();
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -49,9 +50,27 @@ export class UsersController {
     return this.usersService.updateUser(id, dto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
+  }
+
+  //RETIRAR APÓS RESOLVER PROBLEMA TOKEN JWT INVALIDO 401 REQUEST
+  @UseGuards(JwtAuthGuard)
+  @Get('test-auth')
+  testAuth(@Request() req) {
+    return {
+      message: 'Autenticação funcionando!',
+      user: req.user,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  //RETIRAR APÓS RESOLVER PROBLEMA TOKEN JWT INVALIDO 401 REQUEST
+  @UseGuards(JwtAuthGuard)
+  @Get('simple-test')
+  simpleTest() {
+    return { message: 'Esta rota funciona sem banco de dados!' };
   }
 }
