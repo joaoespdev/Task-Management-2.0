@@ -24,11 +24,6 @@ export class UsersController {
     return this.usersService.createUser(dto.name, dto.email, dto.password);
   }
 
-  @Post('login')
-  async login(@Body() dto: CreateUserDto) {
-    return this.usersService.login(dto.email, dto.password);
-  }
-
   @UseGuards(JwtAuthGuard) // Use o guard personalizado
   @Get()
   async findAll() {
