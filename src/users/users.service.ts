@@ -1,11 +1,9 @@
 import {
   Injectable,
   NotFoundException,
-  UnauthorizedException,
   ConflictException,
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Knex } from 'knex';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '../dto/update-user.dto';

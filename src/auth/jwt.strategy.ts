@@ -7,6 +7,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   private readonly logger = new Logger(JwtStrategy.name);
 
   constructor() {
+    console.log('JWT Secret:', process.env.JWT_SECRET);
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,12 +15,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  /*async validate(payload: { sub: number; email: string }) {
-    // o retorno vira req.user
-    return { userId: payload.sub, email: payload.email };
-  }*/
-
-  //RETIRAR APÓS RESOLVER PROBLEMA TOKEN JWT INVALIDO 401 REQUEST, e tirar comentário acima
   async validate(payload: any) {
     this.logger.debug('JWT Payload recebido:', payload);
 

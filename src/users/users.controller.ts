@@ -31,6 +31,12 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('simple-test')
+  simpleTest() {
+    return { message: 'Esta rota funciona sem banco de dados!' };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
@@ -49,23 +55,5 @@ export class UsersController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
-  }
-
-  //RETIRAR APÓS RESOLVER PROBLEMA TOKEN JWT INVALIDO 401 REQUEST
-  @UseGuards(JwtAuthGuard)
-  @Get('test-auth')
-  testAuth(@Request() req) {
-    return {
-      message: 'Autenticação funcionando!',
-      user: req.user,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
-  //RETIRAR APÓS RESOLVER PROBLEMA TOKEN JWT INVALIDO 401 REQUEST
-  @UseGuards(JwtAuthGuard)
-  @Get('simple-test')
-  simpleTest() {
-    return { message: 'Esta rota funciona sem banco de dados!' };
   }
 }

@@ -11,7 +11,7 @@ import { DatabaseModule } from 'src/database/database.module';
   imports: [
     DatabaseModule,
     UsersModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule.register({}),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'changeme',
       signOptions: { expiresIn: '1h' },
