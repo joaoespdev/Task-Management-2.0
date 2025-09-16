@@ -109,13 +109,28 @@ export class TasksService {
       .count('* as count')
       .groupBy('status');
 
-    return rows.reduce(
-      (acc, r: any) => {
-        acc[r.status] = Number(r.count);
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
+    let total = 0;
+    let completed = 0;
+    let pending = 0;
+    let inProgress = 0;
+
+    for (const r of rows) {
+      total += Number(r.count);
+      if (r.status === 'completed') completed = Number(r.count);
+      if (r.status === 'pending') pending = Number(r.count);
+      if (r.status === 'in_progress') inProgress = Number(r.count);
+    }
+
+    const percentCompleted =
+      total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      total,
+      completed,
+      pending,
+      in_progress: inProgress,
+      percent_completed: percentCompleted,
+    };
   }
 
   async statsByUser() {
