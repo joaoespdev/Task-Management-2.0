@@ -8,3 +8,13 @@ services:
       POSTGRES_DB: task_management
     ports:
       - "5432:5432"
+      
+  test-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: task_management_test
+    ports:
+      - "5433:5432"
