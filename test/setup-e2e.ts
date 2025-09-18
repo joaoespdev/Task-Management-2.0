@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
-import * as knex from 'knex';
+import knex, { Knex } from 'knex'; // Importação ajustada
 import * as dotenv from 'dotenv';
-import * as path from 'path';
-import * as fs from 'fs';
 
 // Forçar uso do ambiente de teste
 process.env.NODE_ENV = 'test';
@@ -14,25 +12,25 @@ dotenv.config({ path: '.env.test' });
 
 // Variáveis globais para os testes
 let app: INestApplication;
-let db: any;
+let db: Knex; // Tipagem correta
 
 /**
  * Configura o ambiente de teste, incluindo aplicação e banco
  */
 export async function setupTestApp() {
+  // Se a aplicação já existe, não faz nada. Isso pode ser útil no futuro, mas não é a causa do problema atual.
+  if (app) {
+    return { app, db };
+  }
+
+  // Obter a configuração do knexfile
+  const knexConfig = require('../knexfile').default.test;
+
+  // Criar UMA ÚNICA instância do Knex
+  db = knex(knexConfig);
+
   // Verificar se o banco de teste está acessível
   try {
-    db = knex({
-      client: 'pg',
-      connection: {
-        host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT),
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      },
-    });
-
     await db.raw('SELECT 1');
     console.log('✓ Conexão com banco de teste estabelecida');
   } catch (error) {
@@ -40,18 +38,17 @@ export async function setupTestApp() {
     console.error(
       `Verifique se o container test-db está rodando e acessível em ${process.env.DB_HOST}:${process.env.DB_PORT}`,
     );
+    await db.destroy(); // Garante que a conexão seja fechada em caso de erro
     throw error;
   }
 
-  // Executar migrations no banco de teste
+  // Executar migrations no banco de teste USANDO A MESMA CONEXÃO
   try {
-    const knexConfig = require('../knexfile').default.test;
-    const knexInstance = knex(knexConfig);
-    await knexInstance.migrate.latest();
+    await db.migrate.latest();
     console.log('✓ Migrations aplicadas com sucesso no banco de teste');
-    await knexInstance.destroy();
   } catch (error) {
     console.error('✗ Falha ao executar migrations:', error.message);
+    await db.destroy(); // Garante que a conexão seja fechada em caso de erro
     throw error;
   }
 
@@ -77,7 +74,7 @@ export async function setupTestApp() {
 /**
  * Limpar dados de teste entre testes
  */
-export async function cleanDb(knexInstance: any) {
+export async function cleanDb(knexInstance: Knex) {
   // Limpar dados sem afetar a estrutura do banco
   await knexInstance.raw('TRUNCATE TABLE tasks CASCADE');
   await knexInstance.raw('TRUNCATE TABLE users CASCADE');
@@ -86,8 +83,14 @@ export async function cleanDb(knexInstance: any) {
 /**
  * Fechamento do ambiente de teste
  */
-export async function teardownTestApp(app: INestApplication, db: any) {
-  await cleanDb(db);
-  await db.destroy();
-  await app.close();
+export async function teardownTestApp(
+  appInstance: INestApplication,
+  dbInstance: Knex,
+) {
+  if (appInstance) {
+    await appInstance.close();
+  }
+  if (dbInstance) {
+    await dbInstance.destroy();
+  }
 }
