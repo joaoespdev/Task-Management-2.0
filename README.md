@@ -18,17 +18,15 @@ Uma API REST robusta para gerenciamento de tarefas desenvolvida com **NestJS**, 
 - ✅ Paginação para listagem de tarefas
 - ✅ Busca de tarefas com prazo próximo (24h)
 
-### 📊 Relatórios e Estatísticas
-- ✅ Estatísticas por status das tarefas
-- ✅ Estatísticas por usuário responsável
-- ✅ Percentual de conclusão das tarefas
-- ✅ Identificação de tarefas urgentes
-
 ### 🔒 Segurança
 - ✅ Autenticação JWT obrigatória para rotas protegidas
 - ✅ Validação de dados com class-validator
 - ✅ Middleware de logging para auditoria
 - ✅ Configuração CORS habilitada
+
+### 📊 Relatórios e Estatísticas
+- ✅ Estatísticas por status das tarefas
+- ✅ Percentual de conclusão das tarefas
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -76,9 +74,10 @@ DB_NAME=task_management
 # Configurações JWT
 JWT_SECRET=seu_jwt_secret_super_seguro_aqui
 
+Se não funcionar, troque o valor para 'changeme' 
+
 # Configurações da Aplicação
 PORT=3000
-NODE_ENV=development
 ```
 
 ### 4. Inicie o banco de dados com Docker
@@ -129,12 +128,26 @@ Content-Type: application/json
 # Registrar usuário
 POST /api/users/register
 
-# Listar usuários (autenticado)
+{
+  "name": "Usuario",
+  "email": "usuario@example.com",
+  "password": "12345678"
+}
+
+# Listar usuários
 GET /api/users
 Authorization: Bearer <token>
 
 # Buscar usuário por ID
 GET /api/users/:id
+Authorization: Bearer <token>
+
+# Atualizar usuário
+PUT /api/users/:id
+Authorization: Bearer <token>
+
+# Deletar usuário
+DELETE /api/users/:id
 Authorization: Bearer <token>
 ```
 
@@ -144,8 +157,12 @@ Authorization: Bearer <token>
 POST /api/tasks
 Authorization: Bearer <token>
 
-# Listar tarefas com filtros
-GET /api/tasks?status=pending&assignee_id=1&page=1&limit=10
+# Listar tarefas
+GET /api/tasks
+Authorization: Bearer <token>
+
+# Listar tarefas por id
+GET /api/tasks/:id
 Authorization: Bearer <token>
 
 # Tarefas com prazo próximo (24h)
@@ -155,11 +172,19 @@ Authorization: Bearer <token>
 # Estatísticas por status
 GET /api/tasks/stats/status
 Authorization: Bearer <token>
+
+# Atualizar tarefa
+PUT /api/tasks/:id
+Authorization: Bearer <token>
+
+# Deletar tarefa
+DELETE /api/tasks/:id
+Authorization: Bearer <token>
 ```
 
 ## 🧪 Testes
 
-O projeto possui cobertura completa de testes unitários e de integração.
+O projeto possui cobertura de testes unitários e de integração das principais funcionalidades.
 
 ### Executar testes
 ```bash
@@ -180,13 +205,13 @@ npm run test:e2e
 Para os testes E2E, configure um arquivo `.env.test`:
 
 ```env
+PORT=3001
+JWT_SECRET=test-secret-key
 DB_HOST=localhost
 DB_PORT=5433
 DB_USER=postgres
 DB_PASSWORD=postgres123
 DB_NAME=task_management_test
-JWT_SECRET=test_jwt_secret
-NODE_ENV=test
 ```
 
 Inicie o banco de teste:
@@ -251,30 +276,6 @@ src/
 └── main.ts            # Ponto de entrada
 ```
 
-## 🔧 Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-npm run start:dev        # Inicia em modo desenvolvimento
-npm run start:debug     # Inicia com debug habilitado
-
-# Build e produção
-npm run build           # Compila o projeto
-npm run start:prod      # Inicia em modo produção
-
-# Testes
-npm run test           # Testes unitários
-npm run test:e2e       # Testes end-to-end
-npm run test:cov       # Cobertura de testes
-
-# Qualidade de código
-npm run lint           # Executa ESLint
-npm run format         # Formata código com Prettier
-
-# Banco de dados
-npm run test:db:migrate # Executa migrações no banco de teste
-```
-
 ## 🤝 Contribuição
 
 1. Faça um fork do projeto
@@ -283,17 +284,15 @@ npm run test:db:migrate # Executa migrações no banco de teste
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
 ## 👨‍💻 Autor
 
 Desenvolvido como parte de um desafio técnico para demonstrar conhecimentos em:
 - Desenvolvimento de APIs REST com NestJS
 - Arquitetura limpa e padrões de design
+- Validação de dados e tratamento de erros
 - Testes automatizados (unitários e integração)
 - Containerização com Docker
+- Entrega em curto prazo
 - Documentação técnica
 
 ---
